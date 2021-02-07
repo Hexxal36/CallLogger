@@ -1,0 +1,18 @@
+﻿@page "/contacts/edit/{Id}"
+@inject HttpClient _client
+
+<h2>Edit Contact Form</h2>
+
+<ContactForm Method="Put" Id=Id Contact=_contact />
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Contact _contact { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _contact = await _client.GetFromJsonAsync<Contact>($"/contact/{Id}");
+    }
+}

@@ -1,0 +1,134 @@
+﻿@page "/calls"
+@using System.Text
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient _client
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<header>
+    <h3>Calls</h3>
+
+    <nav>
+        <NavLink href="/calls/add">
+            <i class="fas fa-plus"></i>
+        </NavLink>
+    </nav>
+</header>
+
+<div class="call-list">
+    @if (_calls.Count > 0)
+    {
+        @foreach (var call in _calls.Where(x => x != null))
+        {
+            <div class="call">
+                <div class="call-left">
+                    <div class="call-top">
+                        @call.Contact.Name
+                    </div>
+                    <div class="call-bottom">
+                        <div class="call-platform">
+                            @switch (call.Platform)
+                            {
+                                case "Discord":
+                                    <span>
+                                        @if (call.Contact.DiscordName != null)
+                                        {
+                                            @call.Contact.DiscordName
+                                        }
+                                        else
+                                        {
+                                             <span>{Not set}</span>
+                                        }
+                                    </span>
+                                    <i class="fab fa-discord"></i>
+                                    break;
+                                case "Messenger":
+                                    <span>
+                                        @if (call.Contact.MessengerName != null)
+                                        {
+                                            @call.Contact.MessengerName
+                                        }
+                                        else
+                                        {
+                                            <span>{Not set}</span>
+                                        }
+                                    </span>
+                                    <i class="fab fa-facebook-messenger"></i>
+                                    break;
+                                case "Phone":
+                                    <span>
+                                        @if (call.Contact.PhoneNumber != null)
+                                        {
+                                            @call.Contact.PhoneNumber
+                                        }
+                                        else
+                                        {
+                                            <span>{Not set}</span>
+                                        }
+                                    </span>
+
+                                    <i class="fas fa-phone-alt"></i>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        </div>
+                        <div class="call-start">
+                            Started At: @call.StartTime.ToString("HH:mm")
+                        </div>
+
+                        <div class="call-length">
+                            Lasted for: @((call.EndTime - call.StartTime).TotalMinutes) Minutes
+                        </div>
+                    </div>
+                </div>
+                <div class="call-right">
+                    @call.Status
+
+                    <NavLink href=@("calls/edit/" + @call.Id) class="btn btn-primary">
+                        Edit
+                    </NavLink>
+
+                    <button class="btn btn-danger" @onclick=@(async () => await OnDeletedAsync(call.Id))>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <span>You dont have any calls in your log.</span>
+    }
+</div>
+
+
+@code {
+    private List<Call> _calls = new();
+
+    private AuthenticationState _authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCallListAsync();
+    }
+
+    private async Task GetCallListAsync()
+    {
+        _authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        Console.WriteLine(_authState.User.Identity.Name);
+        _calls = await _client.GetFromJsonAsync<List<Call>>($"/call?user={_authState.User.Identity.Name}");
+
+        foreach (var call in _calls)
+        {
+            call.Contact = await _client.GetFromJsonAsync<Contact>($"/contact/{call.ContactId}");
+        }
+    }
+
+    private async Task OnDeletedAsync(int id)
+    {
+        await _client.DeleteAsync($"/call/{id}");
+        await GetCallListAsync();
+    }
+}

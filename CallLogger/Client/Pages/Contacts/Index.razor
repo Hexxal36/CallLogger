@@ -1,0 +1,129 @@
+﻿@page "/contacts"
+@using System.Text
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient _client
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<header>
+    <h3>Contacts</h3>
+
+    <nav>
+        <NavLink href="/contacts/add">
+            <i class="fas fa-plus"></i>
+        </NavLink>
+    </nav>
+</header>
+
+<div class="contact-list">
+
+    @if (_contacts.Count > 0)
+    {
+
+        @foreach (var contact in _contacts)
+        {
+            <div class="contact">
+                <div class="contact-left">
+                    <div class="contact-top">
+                        @contact.Name
+                    </div>
+                    <div class="contact-bottom">
+                        <div class="contact-platform">
+                            @if (contact.PhoneNumber != null)
+                            {
+                                <p>
+                                    @contact.PhoneNumber
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    {Not set}
+                                </p>
+                            }
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="contact-platform">
+                            @if (contact.DiscordName != null)
+                            {
+                                <p>
+                                    @contact.DiscordName
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    {Not set}
+                                </p>
+                            }
+                            <i class="fab fa-discord"></i>
+                        </div>
+                        <div class="contact-platform">
+                            @if (contact.MessengerName != null)
+                            {
+                                <p>
+                                    @contact.MessengerName
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    {Not set}
+                                </p>
+                            }
+                            <i class="fab fa-facebook-messenger"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-right">
+                    @if (contact.IsFavorite)
+                    {
+                        <i class="fas fa-star"></i>
+                    }
+                    else
+                    {
+                        <i class="far fa-star"></i>
+                    }
+
+                    <NavLink href=@("contacts/edit/" + @contact.Id) class="btn btn-primary">
+                        Edit
+                    </NavLink>
+
+                    <button class="btn btn-danger" @onclick=@(async () => await OnDeletedAsync(contact.Id))>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <span>You don't have any contacts yet.</span>
+    }
+</div>
+
+
+@code {
+    private List<Contact> _contacts = new();
+
+    private AuthenticationState _authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetContactListAsync();
+    }
+
+    private async Task GetContactListAsync()
+    {
+        _authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        Console.WriteLine(_authState.User.Identity.Name);
+        _contacts = await _client.GetFromJsonAsync<List<Contact>>($"/contact?user={_authState.User.Identity.Name}");
+    }
+
+    private async Task OnDeletedAsync(int id)
+    {
+        await _client.DeleteAsync($"/contact/{id}");
+        await GetContactListAsync();
+    }
+}

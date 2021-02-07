@@ -1,0 +1,46 @@
+﻿header {
+    display: flex;
+    gap: 2em;
+}
+
+    header ::deep a {
+        font-size: 1.5em;
+    }
+
+.contact {
+    display: flex;
+    border-bottom: 1px dashed black;
+    padding: 0.5em 0;
+}
+
+.contact-left {
+    width: 100%;
+}
+
+.contact-bottom {
+    display: flex;
+    gap: 1em;
+    width: 100%;
+}
+
+.contact-platform {
+    display: flex;
+    gap: 1em;
+    width: 33%
+}
+
+    .contact-platform p {
+        margin-right: .2em;
+    }
+
+    svg {
+        font-size: 24px;
+    }
+
+    .contact-right {
+        margin-left: auto;
+        margin-right: 2em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+    }

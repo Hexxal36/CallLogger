@@ -1,0 +1,18 @@
+﻿@page "/calls/edit/{Id}"
+@inject HttpClient _client
+
+<h2>Edit Contact Form</h2>
+
+<CallForm Method="Put" Id=Id Call=_call />
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Call _call { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _call = await _client.GetFromJsonAsync<Call>($"/call/{Id}");
+    }
+}

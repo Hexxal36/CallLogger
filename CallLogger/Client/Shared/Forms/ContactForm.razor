@@ -1,0 +1,106 @@
+﻿@using System.Text
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient _client
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavManager
+
+<EditForm Model="_contact" OnSubmit="Submit" class="card card-body bg-light mt-5">
+    <div class="form-group row">
+        <label for="name" class="col-md-2 col-form-label">Name:</label>
+        <div class="col-md-10">
+            <InputText id="name" class="form-control" @bind-Value="_contact.Name" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="supplier" class="col-md-2 col-form-label">DiscordName:</label>
+        <div class="col-md-10">
+            <InputText id="supplier" class="form-control" @bind-Value="_contact.DiscordName" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="price" class="col-md-2 col-form-label">MessengerName:</label>
+        <div class="col-md-10">
+            <InputText id="price" class="form-control" @bind-Value="_contact.MessengerName" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="image" class="col-md-2 col-form-label">PhoneNumber:</label>
+        <div class="col-md-10">
+            <InputText id="image" class="form-control" @bind-Value="_contact.PhoneNumber" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="image" class="col-md-2 col-form-label">IsFavorite:</label>
+        <div class="col-md-10">
+            <InputCheckbox id="image" class="form-control" @bind-Value="_contact.IsFavorite" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button type="submit" class="btn btn-success">
+                @if (Method == "Post")
+                {
+                    <span>Create</span>
+                }
+                else
+                {
+                    <span>Edit</span>
+                }
+
+            </button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Contact Contact { get; set; }
+
+    private Contact _contact = new();
+
+    [Parameter]
+    public string Method { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Contact != null && Method == "Put")
+        {
+            _contact = Contact;
+        }
+    }
+
+    private async Task Submit()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        _contact.User = authState.User.Identity.Name;
+
+        var content = JsonSerializer.Serialize(_contact);
+        var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+
+
+        var postResult = new HttpResponseMessage();
+        switch (Method)
+        {
+            case "Post":
+                postResult = await _client.PostAsync("https://localhost:44375/contact", bodyContent);
+                break;
+            case "Put":
+                postResult = await _client.PutAsync($"https://localhost:44375/contact/{_contact.Id}", bodyContent);
+                break;
+            default:
+                break;
+        }
+        var postContent = await postResult.Content.ReadAsStringAsync();
+        if (!postResult.IsSuccessStatusCode)
+        {
+            throw new ApplicationException(postContent);
+        }
+
+        NavManager.NavigateTo("/contacts");
+    }
+}

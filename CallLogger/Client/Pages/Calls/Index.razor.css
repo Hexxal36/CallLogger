@@ -1,0 +1,46 @@
+﻿header {
+    display: flex;
+    gap: 2em;
+}
+
+    header ::deep a {
+        font-size: 1.5em;
+    }
+
+.call {
+    display: flex;
+    border-bottom: 1px dashed black;
+    padding: 0.5em 0;
+}
+
+.call-left {
+    width: 100%;
+}
+
+.call-bottom {
+    display: flex;
+    gap: 1em;
+    width: 100%;
+}
+
+.call-platform {
+    display: flex;
+    gap: 1em;
+    width: 33%
+}
+
+    .call-platform p {
+        margin-right: .2em;
+    }
+
+    svg {
+        font-size: 24px;
+    }
+
+    .call-right {
+        margin-left: auto;
+        margin-right: 2em;
+        display: flex;
+        align-items: center;
+        gap: 1em;
+    }

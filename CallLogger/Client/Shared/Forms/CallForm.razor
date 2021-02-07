@@ -1,0 +1,175 @@
+﻿@using System.Text
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
+@inject HttpClient _client
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavManager
+
+<EditForm Model="_call" OnSubmit="Submit" class="card card-body bg-light mt-5">
+    <div class="form-group row">
+        <label for="name" class="col-md-2 col-form-label">Name:</label>
+        <div class="col-md-10">
+            <select id="name" class="form-control" @bind="_call.ContactId">
+                <option value=""></option>
+                @foreach (var contact in _contacts)
+                {
+                    <option value="@contact.Id">@contact.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="supplier" class="col-md-2 col-form-label">Platform:</label>
+        <div class="col-md-10">
+            <select id="name" class="form-control" @bind="_call.Platform">
+                <option value=""></option>
+                <option value="Discord">Discord</option>
+                <option value="Messenger">Messenger</option>
+                <option value="Phone">Phone</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="image" class="col-md-2 col-form-label">Status:</label>
+        <div class="col-md-10">
+            <select id="image" class="form-control" @bind="_call.Status">
+                <option value=""></option>
+                <option value="Accepted">Accepted</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Missed">Missed</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group row flex-row">
+        <label for="image" class="col-md-2 col-form-label">StartTime:</label>
+        <InputDate id="image" class="form-inline w-25" @bind-Value="_call.StartTime" />
+        <select id="image" class="form-inline w-25" @bind="_startTimeHours">
+            @for (int i = 0; i <= 23; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>:
+        <select id="image" class="form-inline w-25" @bind="_startTimeMinutes">
+            @for (int i = 0; i <= 60; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+    </div>
+    <div class="form-group row">
+        <label for="image" class="col-md-2 col-form-label">EndTime:</label>
+        <InputDate id="image" class="form-inline w-25" @bind-Value="_call.EndTime" />
+        <select id="image" class="form-inline w-25" @bind="_endTimeHours">
+            @for (int i = 0; i <= 23; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>:
+        <select id="image" class="form-inline w-25" @bind="_endTimeMinutes">
+            @for (int i = 0; i <= 60; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button type="submit" class="btn btn-success">
+                @if (Method == "Post")
+                {
+                    <span>Create</span>
+                }
+                else
+                {
+                    <span>Edit</span>
+                }
+            </button>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    private Call _call = new Call()
+    {
+        StartTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day),
+        EndTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day),
+    };
+
+    private List<Contact> _contacts = new();
+
+    private AuthenticationState _authState;
+
+    [Parameter]
+    public Call Call { get; set; }
+
+    [Parameter]
+    public string Method { get; set; }
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private int _startTimeMinutes;
+    private int _startTimeHours;
+    private int _endTimeMinutes;
+    private int _endTimeHours;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        Console.WriteLine(_authState.User.Identity.Name);
+        _contacts = await _client.GetFromJsonAsync<List<Contact>>($"/contact?user={_authState.User.Identity.Name}");
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Call != null && Method == "Put")
+        {
+            _call = Call;
+        }
+    }
+
+    private async Task Submit()
+    {
+
+        _call.User = _authState.User.Identity.Name;
+
+        _call.StartTime = new DateTime(_call.StartTime.Year,
+            _call.StartTime.Month,
+            _call.StartTime.Day,
+            _startTimeHours,
+            _startTimeMinutes,
+            0);
+
+        _call.EndTime = new DateTime(_call.StartTime.Year,
+            _call.EndTime.Month,
+            _call.EndTime.Day,
+            _endTimeHours,
+            _endTimeMinutes,
+            0);
+
+        var content = JsonSerializer.Serialize(_call);
+        Console.WriteLine(content);
+        var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+        var postResult = new HttpResponseMessage();
+        switch (Method)
+        {
+            case "Post":
+                postResult = await _client.PostAsync("/call", bodyContent);
+                break;
+            case "Put":
+                postResult = await _client.PutAsync($"/call/{_call.Id}", bodyContent);
+                break;
+            default:
+                break;
+        }
+        var postContent = await postResult.Content.ReadAsStringAsync();
+        if (!postResult.IsSuccessStatusCode)
+        {
+            throw new ApplicationException(postContent);
+        }
+
+        NavManager.NavigateTo("/calls");
+    }
+}

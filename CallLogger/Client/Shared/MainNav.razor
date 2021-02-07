@@ -1,0 +1,15 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+<AuthorizeView>
+    <Authorized>
+        <header>
+            <NavLink href="/calls">
+                <span class="oi oi-phone"></span>Calls
+            </NavLink>
+            <NavLink href="/contacts">
+                <span class="oi oi-person"></span>People
+            </NavLink>
+        </header>
+    </Authorized>
+</AuthorizeView>
