@@ -5,11 +5,13 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavManager
 
-<EditForm Model="_call" OnSubmit="Submit" class="card card-body bg-light mt-5">
+<EditForm Model="_call" OnValidSubmit="Submit" class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
     <div class="form-group row">
-        <label for="name" class="col-md-2 col-form-label">Name:</label>
+        <label class="col-md-2 col-form-label">Name:</label>
         <div class="col-md-10">
-            <select id="name" class="form-control" @bind="_call.ContactId">
+            <select class="form-control" @bind="_call.ContactId" required>
                 <option value=""></option>
                 @foreach (var contact in _contacts)
                 {
@@ -19,9 +21,9 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="supplier" class="col-md-2 col-form-label">Platform:</label>
+        <label class="col-md-2 col-form-label">Platform:</label>
         <div class="col-md-10">
-            <select id="name" class="form-control" @bind="_call.Platform">
+            <select class="form-control" @bind="_call.Platform" required>
                 <option value=""></option>
                 <option value="Discord">Discord</option>
                 <option value="Messenger">Messenger</option>
@@ -30,9 +32,9 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="image" class="col-md-2 col-form-label">Status:</label>
+        <label class="col-md-2 col-form-label">Status:</label>
         <div class="col-md-10">
-            <select id="image" class="form-control" @bind="_call.Status">
+            <select class="form-control" @bind="_call.Status" required>
                 <option value=""></option>
                 <option value="Accepted">Accepted</option>
                 <option value="Rejected">Rejected</option>
@@ -41,15 +43,15 @@
         </div>
     </div>
     <div class="form-group row flex-row">
-        <label for="image" class="col-md-2 col-form-label">StartTime:</label>
-        <InputDate id="image" class="form-inline w-25" @bind-Value="_call.StartTime" />
-        <select id="image" class="form-inline w-25" @bind="_startTimeHours">
+        <label class="col-md-2 col-form-label">StartTime:</label>
+        <InputDate class="form-inline w-25" @bind-Value="_call.StartTime" />
+        <select class="form-inline w-25" @bind="_startTimeHours">
             @for (int i = 0; i <= 23; i++)
             {
                 <option value="@i">@i</option>
             }
         </select>:
-        <select id="image" class="form-inline w-25" @bind="_startTimeMinutes">
+        <select class="form-inline w-25" @bind="_startTimeMinutes">
             @for (int i = 0; i <= 60; i++)
             {
                 <option value="@i">@i</option>
@@ -57,15 +59,15 @@
         </select>
     </div>
     <div class="form-group row">
-        <label for="image" class="col-md-2 col-form-label">EndTime:</label>
-        <InputDate id="image" class="form-inline w-25" @bind-Value="_call.EndTime" />
-        <select id="image" class="form-inline w-25" @bind="_endTimeHours">
+        <label class="col-md-2 col-form-label">EndTime:</label>
+        <InputDate class="form-inline w-25" @bind-Value="_call.EndTime" />
+        <select class="form-inline w-25" @bind="_endTimeHours">
             @for (int i = 0; i <= 23; i++)
             {
                 <option value="@i">@i</option>
             }
         </select>:
-        <select id="image" class="form-inline w-25" @bind="_endTimeMinutes">
+        <select class="form-inline w-25" @bind="_endTimeMinutes">
             @for (int i = 0; i <= 60; i++)
             {
                 <option value="@i">@i</option>
@@ -130,9 +132,8 @@
         }
     }
 
-    private async Task Submit()
+    private async Task Submit(EditContext context)
     {
-
         _call.User = _authState.User.Identity.Name;
 
         _call.StartTime = new DateTime(_call.StartTime.Year,

@@ -5,35 +5,37 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavManager
 
-<EditForm Model="_contact" OnSubmit="Submit" class="card card-body bg-light mt-5">
+<EditForm Model="_contact" OnValidSubmit="Submit" class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
     <div class="form-group row">
-        <label for="name" class="col-md-2 col-form-label">Name:</label>
+        <label class="col-md-2 col-form-label">Name:</label>
         <div class="col-md-10">
-            <InputText id="name" class="form-control" @bind-Value="_contact.Name" />
+            <InputText class="form-control" @bind-Value="_contact.Name" required />
         </div>
     </div>
     <div class="form-group row">
-        <label for="supplier" class="col-md-2 col-form-label">DiscordName:</label>
+        <label class="col-md-2 col-form-label">DiscordName:</label>
         <div class="col-md-10">
-            <InputText id="supplier" class="form-control" @bind-Value="_contact.DiscordName" />
+            <InputText class="form-control" @bind-Value="_contact.DiscordName" />
         </div>
     </div>
     <div class="form-group row">
-        <label for="price" class="col-md-2 col-form-label">MessengerName:</label>
+        <label class="col-md-2 col-form-label">MessengerName:</label>
         <div class="col-md-10">
-            <InputText id="price" class="form-control" @bind-Value="_contact.MessengerName" />
+            <InputText class="form-control" @bind-Value="_contact.MessengerName" />
         </div>
     </div>
     <div class="form-group row">
-        <label for="image" class="col-md-2 col-form-label">PhoneNumber:</label>
+        <label class="col-md-2 col-form-label">PhoneNumber:</label>
         <div class="col-md-10">
-            <InputText id="image" class="form-control" @bind-Value="_contact.PhoneNumber" />
+            <InputText class="form-control" @bind-Value="_contact.PhoneNumber" />
         </div>
     </div>
     <div class="form-group row">
-        <label for="image" class="col-md-2 col-form-label">IsFavorite:</label>
+        <label class="col-md-2 col-form-label">IsFavorite:</label>
         <div class="col-md-10">
-            <InputCheckbox id="image" class="form-control" @bind-Value="_contact.IsFavorite" />
+            <InputCheckbox class="form-control" @bind-Value="_contact.IsFavorite" />
         </div>
     </div>
     <div class="row">

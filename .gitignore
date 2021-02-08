@@ -1,0 +1,10 @@
+.vs/**
+CallLogger/Server/bin/**
+CallLogger/Server/obj/**
+CallLogger/Client/bin/**
+CallLogger/Client/obj/**
+CallLogger/Shared/bin/**
+CallLogger/Shared/obj/**
+CallLogger/Client/wwwroot/css/bootstrap/**
+CallLogger/Client/wwwroot/css/font-awesome/**
+CallLogger/Client/wwwroot/css/open-iconic/**
